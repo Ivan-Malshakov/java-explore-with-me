@@ -23,7 +23,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerSQLIntegrityConstraintViolationException(final SQLIntegrityConstraintViolationException e) {
-        log.error(e.getMessage());
+        log.error("SQL Error: {}", e.getMessage());
         return new ErrorResponse(List.of("SQL Error"), e.getMessage(),
                 HttpStatus.CONFLICT.getReasonPhrase(), HttpStatus.CONFLICT.name());
     }
@@ -31,7 +31,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlerValidationException(final ValidationException e) {
-        log.error(e.getMessage());
+        log.error("Validation Error: {}", e.getMessage());
         return new ErrorResponse(List.of("Validation Error"), e.getMessage(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(), HttpStatus.BAD_REQUEST.name());
     }
@@ -39,7 +39,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handlerDataNotFoundException(final DataNotFoundException e) {
-        log.error(e.getMessage());
+        log.error("Data Not Found: {}", e.getMessage());
         return new ErrorResponse(List.of("Data Not Found"), e.getMessage(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(), HttpStatus.NOT_FOUND.name());
     }
@@ -47,15 +47,15 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerConflictRequestException(final ConflictRequestException e) {
-        log.error(e.getMessage());
-        return new ErrorResponse(List.of("Conflict Request"), e.getMessage(),
+        log.error("Conflict Request Error: {}", e.getMessage());
+        return new ErrorResponse(List.of("Conflict Request Error"), e.getMessage(),
                 HttpStatus.CONFLICT.getReasonPhrase(), HttpStatus.CONFLICT.name());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlerBadRequestException(final BadRequestException e) {
-        log.error(e.getMessage());
+        log.error("Bad request: {}", e.getMessage());
         return new ErrorResponse(List.of("Bad Request"), e.getMessage(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(), HttpStatus.BAD_REQUEST.name());
     }
@@ -63,7 +63,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerCategoryNotEmptyException(final CategoryNotEmptyException e) {
-        log.error(e.getMessage());
+        log.error("Conflict Request Error: {}", e.getMessage());
         return new ErrorResponse(List.of("Category Not Empty"), e.getMessage(),
                 HttpStatus.CONFLICT.getReasonPhrase(), HttpStatus.CONFLICT.name());
     }
@@ -71,7 +71,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handlerDataIntegrityViolationException(final DataIntegrityViolationException e) {
-        log.error(e.getMessage());
+        log.error("Conflict Request Error: {}", e.getMessage());
         return new ErrorResponse(List.of("Data Integrity Violation"), e.getMessage(),
                 HttpStatus.CONFLICT.getReasonPhrase(), HttpStatus.CONFLICT.name());
     }
@@ -79,7 +79,7 @@ public class ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handlerMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
-        log.error(e.getMessage());
+        log.error("Bad request: {}", e.getMessage());
         return new ErrorResponse(List.of("Method Argument Not Valid"), e.getMessage(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(), HttpStatus.BAD_REQUEST.name());
     }
