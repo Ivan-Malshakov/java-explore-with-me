@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.stats.EndpointHit;
 import ru.practicum.ewm.dto.stats.ViewStats;
+import ru.practicum.ewm.stats.exception.BadRequestException;
 import ru.practicum.ewm.stats.mapper.StatsMapper;
 import ru.practicum.ewm.stats.model.Stats;
 import ru.practicum.ewm.stats.repository.JpaStatsRepository;
@@ -34,6 +35,10 @@ public class StatsServiceImpl implements StatsService {
 
     @Override
     public List<ViewStats> get(LocalDateTime start, LocalDateTime end, List<String> uris, boolean isUnique) {
+        if (start.isAfter(end)) {
+            throw new BadRequestException("Date start after date end: " + start + " > " + end);
+        }
+
         List<ViewStats> stats;
         if (!isUnique) {
             if (uris == null) {
