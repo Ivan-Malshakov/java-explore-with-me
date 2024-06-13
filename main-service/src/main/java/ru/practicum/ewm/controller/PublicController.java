@@ -5,11 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.client.stats.StatsClient;
-import ru.practicum.ewm.dto.CategoryDto;
-import ru.practicum.ewm.dto.CompilationDto;
-import ru.practicum.ewm.dto.EventFullDto;
-import ru.practicum.ewm.dto.EventShortDto;
+import ru.practicum.ewm.dto.*;
 import ru.practicum.ewm.dto.stats.EndpointHit;
+import ru.practicum.ewm.model.SortComment;
 import ru.practicum.ewm.service.CategoryService;
 import ru.practicum.ewm.service.CompilationService;
 import ru.practicum.ewm.service.EventService;
@@ -86,5 +84,15 @@ public class PublicController {
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
         return eventService.getEventsByFilter(text, categories, paid, rangeStart, rangeEnd, onlyAvailable,
                 sort, from, size);
+    }
+
+    @GetMapping(value = "/events/{eventId}/comments")
+    public List<CommentShortDto> getComments(@PathVariable @Min(0) int eventId,
+                                             @RequestParam(defaultValue = "0") @Min(0) int from,
+                                             @RequestParam(defaultValue = "10") @Min(1) int size,
+                                             @RequestParam(defaultValue = "DESCCREATEDDATA") SortComment sortComment) {
+        log.info("Get comments event with id = " + eventId + "from = " + from
+                + "size = " + size + "sort" + sortComment);
+        return eventService.getCommentToEvent(eventId, from, size, sortComment);
     }
 }

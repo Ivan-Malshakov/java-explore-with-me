@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.*;
+import ru.practicum.ewm.model.SortComment;
 import ru.practicum.ewm.service.EventService;
 import ru.practicum.ewm.service.RequestService;
 
@@ -84,5 +85,42 @@ public class PrivateController {
                                                      @PathVariable @Min(0) int eventId) {
         log.info("Get requests with userId = {}, eventId = {}", userId, eventId);
         return requestService.getRequestsToEvent(userId, eventId);
+    }
+
+    @PostMapping(value = "/{userId}/events/{eventId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto saveComment(@PathVariable @Min(0) int userId,
+                                  @PathVariable @Min(0) int eventId,
+                                  @RequestBody @Valid NewCommentDto commentDto) {
+        log.info("Create comment by user with id = " + userId + " for event with id = " + eventId
+                + " comment = " + commentDto);
+        return eventService.addComment(commentDto, eventId, userId);
+    }
+
+    @PatchMapping(value = "/{userId}/comments/{commentId}")
+    public CommentDto updateComment(@PathVariable @Min(0) int userId,
+                                    @PathVariable @Min(0) int commentId,
+                                    @RequestBody @Valid NewCommentDto commentDto) {
+        log.info("Update comment by user with id = " + userId + " for comment with id = " + commentId
+                + " comment = " + commentDto);
+        return eventService.updateComment(commentDto, commentId, userId);
+    }
+
+    @DeleteMapping(value = "/{userId}/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeComment(@PathVariable @Min(0) int userId,
+                              @PathVariable @Min(0) int commentId) {
+        log.info("Remove comment with id = {} by user with id = {}", commentId, userId);
+        eventService.removeCommentToUser(commentId, userId);
+    }
+
+    @GetMapping(value = "/{userId}/comments")
+    public List<CommentDto> getComments(@PathVariable @Min(0) int userId,
+                                        @RequestParam(defaultValue = "0") @Min(0) int from,
+                                        @RequestParam(defaultValue = "10") @Min(1) int size,
+                                        @RequestParam(defaultValue = "DESCCREATEDDATA") SortComment sortComment) {
+        log.info("Get comments user with id = " + userId + "from = " + from
+                + "size = " + size + "sort" + sortComment);
+        return eventService.getCommentToAuthor(userId, from, size, sortComment);
     }
 }

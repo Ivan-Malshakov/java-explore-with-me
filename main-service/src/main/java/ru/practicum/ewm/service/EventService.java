@@ -1,6 +1,7 @@
 package ru.practicum.ewm.service;
 
 import ru.practicum.ewm.dto.*;
+import ru.practicum.ewm.model.SortComment;
 import ru.practicum.ewm.model.State;
 
 import java.time.LocalDateTime;
@@ -25,4 +26,16 @@ public interface EventService {
     List<EventShortDto> getEventsByFilter(String text, List<Integer> categories, Boolean paid,
                                           LocalDateTime rangeStart, LocalDateTime rangeEnd,
                                           Boolean onlyAvailable, String sort, int from, int size);
+
+    CommentDto addComment(NewCommentDto newCommentDto, int eventId, int userId);
+
+    CommentDto updateComment(NewCommentDto newCommentDto, int commentId, int userId);
+
+    List<CommentShortDto> getCommentToEvent(int eventId, int from, int size, SortComment sort);
+
+    List<CommentDto> getCommentToAuthor(int userId, int from, int size, SortComment sort);
+
+    void removeCommentToUser(int commentId, int userId);
+
+    void removeCommentToAdmin(int commentId);
 }

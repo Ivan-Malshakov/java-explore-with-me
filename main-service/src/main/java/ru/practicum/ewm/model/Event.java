@@ -72,6 +72,9 @@ public class Event {
     @Transient
     private Integer views;
 
+    @OneToMany(mappedBy = "event", fetch = FetchType.LAZY)
+    private Set<Comment> comments;
+
     public Event(Integer id) {
         this.id = id;
     }

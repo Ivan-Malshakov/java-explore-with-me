@@ -113,4 +113,11 @@ public class AdminController {
         log.info("Remove compilation with id = {}", compId);
         compilationService.removeCompilation(compId);
     }
+
+    @DeleteMapping(value = "comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeComment(@PathVariable @Min(0) int commentId) {
+        log.info("Remove comment by a admin with commentId = {}", commentId);
+        eventService.removeCommentToAdmin(commentId);
+    }
 }
