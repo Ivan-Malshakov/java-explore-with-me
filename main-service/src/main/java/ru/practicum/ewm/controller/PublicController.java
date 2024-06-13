@@ -14,6 +14,7 @@ import ru.practicum.ewm.service.EventService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -28,7 +29,7 @@ public class PublicController {
     private final StatsClient statsClient;
 
     @GetMapping(value = "/categories/{catId}")
-    CategoryDto getCategory(@PathVariable @Min(0) int catId) {
+    CategoryDto getCategory(@PathVariable @Positive int catId) {
         log.info("Get category with id = {}", catId);
         return categoryService.getCategory(catId);
     }
@@ -41,7 +42,7 @@ public class PublicController {
     }
 
     @GetMapping(value = "/events/{id}")
-    EventFullDto getEvent(@PathVariable @Min(0) int id, HttpServletRequest request) {
+    EventFullDto getEvent(@PathVariable @Positive int id, HttpServletRequest request) {
         log.info("Get event with id = {}", id);
         statsClient.saveHit(new EndpointHit("ewm-main-service",
                 request.getRequestURI(), request.getRemoteAddr(),
@@ -50,7 +51,7 @@ public class PublicController {
     }
 
     @GetMapping(value = "/compilations/{compId}")
-    CompilationDto getCompilation(@PathVariable @Min(0) int compId) {
+    CompilationDto getCompilation(@PathVariable @Positive int compId) {
         log.info("Get compilation with id = {}", compId);
         return compilationService.getCompilation(compId);
     }
@@ -87,7 +88,7 @@ public class PublicController {
     }
 
     @GetMapping(value = "/events/{eventId}/comments")
-    public List<CommentShortDto> getComments(@PathVariable @Min(0) int eventId,
+    public List<CommentShortDto> getComments(@PathVariable @Positive int eventId,
                                              @RequestParam(defaultValue = "0") @Min(0) int from,
                                              @RequestParam(defaultValue = "10") @Min(1) int size,
                                              @RequestParam(defaultValue = "DESCCREATEDDATA") SortComment sortComment) {
