@@ -3,6 +3,7 @@ package ru.practicum.ewm.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import ru.practicum.ewm.dto.*;
+import ru.practicum.ewm.model.Comment;
 import ru.practicum.ewm.model.Compilation;
 import ru.practicum.ewm.model.Event;
 
@@ -50,4 +51,20 @@ public interface EventAndCompilationMapper {
     CompilationDto toDtoCompilation(Compilation compilation);
 
     List<CompilationDto> toDtoCompilations(List<Compilation> compilations);
+
+    Comment toModelComment(NewCommentDto newCommentDto);
+
+    EventToCommentDto toEventToCommentDto(Event event);
+
+    @Mapping(target = "authorName", source = "comment.author.name")
+    @Mapping(target = "created", source = "comment.created", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    CommentDto toCommentDto(Comment comment);
+
+    @Mapping(target = "authorName", source = "comment.author.name")
+    @Mapping(target = "created", source = "comment.created", dateFormat = "yyyy-MM-dd HH:mm:ss")
+    CommentShortDto toCommentShortDto(Comment comment);
+
+    List<CommentDto> toCommentsDto(List<Comment> comments);
+
+    List<CommentShortDto> toCommentsShortDto(List<Comment> comments);
 }

@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.ewm.exception.BadRequestException;
 import ru.practicum.ewm.exception.CategoryNotEmptyException;
 import ru.practicum.ewm.exception.ConflictRequestException;
@@ -81,6 +82,14 @@ public class ErrorHandler {
     public ErrorResponse handlerMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         log.error("Bad request: {}", e.getMessage());
         return new ErrorResponse(List.of("Method Argument Not Valid"), e.getMessage(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(), HttpStatus.BAD_REQUEST.name());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handlerMethodArgumentTypeMismatchException(final MethodArgumentTypeMismatchException e) {
+        log.error("Bad request: {}", e.getMessage());
+        return new ErrorResponse(List.of("Method Argument Type Mismatch"), e.getMessage(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(), HttpStatus.BAD_REQUEST.name());
     }
 }

@@ -15,6 +15,7 @@ import ru.practicum.ewm.service.UserService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,7 +38,7 @@ public class AdminController {
 
     @DeleteMapping(value = "/users/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void removeUser(@PathVariable @Min(0) int userId) {
+    void removeUser(@PathVariable @Positive int userId) {
         log.info("Remove user with id = {}", userId);
         userService.removeUser(userId);
     }
@@ -59,14 +60,14 @@ public class AdminController {
 
     @PatchMapping(value = "/categories/{catId}")
     CategoryDto updateCategory(@RequestBody @Valid NewCategoryDto categoryDto,
-                               @PathVariable @Min(0) int catId) {
+                               @PathVariable @Positive int catId) {
         log.info("Update category with id = {}: {}", catId, categoryDto);
         return categoryService.updateCategory(catId, categoryDto);
     }
 
     @DeleteMapping(value = "/categories/{catId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void removeCategory(@PathVariable @Min(0) int catId) {
+    void removeCategory(@PathVariable @Positive int catId) {
         log.info("Remove category with id = {}", catId);
         categoryService.removeCategory(catId);
     }
@@ -87,7 +88,7 @@ public class AdminController {
     }
 
     @PatchMapping(value = "/events/{eventId}")
-    EventFullDto updateEvent(@PathVariable @Min(0) int eventId,
+    EventFullDto updateEvent(@PathVariable @Positive int eventId,
                              @RequestBody @Valid UpdateEventAdminRequest updateEventAdminRequest) {
         log.info("Update event with id = {}, request = {}", eventId, updateEventAdminRequest);
         return eventService.updateEventAdmin(eventId, updateEventAdminRequest);
@@ -102,15 +103,22 @@ public class AdminController {
 
     @PatchMapping(value = "/compilations/{compId}")
     CompilationDto updateCompilation(@RequestBody @Valid UpdateCompilationRequest compilationDto,
-                                     @PathVariable @Min(0) int compId) {
+                                     @PathVariable @Positive int compId) {
         log.info("Update compilation with id = {}, request = {}", compId, compilationDto);
         return compilationService.updateCompilation(compId, compilationDto);
     }
 
     @DeleteMapping(value = "/compilations/{compId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void removeCompilation(@PathVariable @Min(0) int compId) {
+    void removeCompilation(@PathVariable @Positive int compId) {
         log.info("Remove compilation with id = {}", compId);
         compilationService.removeCompilation(compId);
+    }
+
+    @DeleteMapping(value = "comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeComment(@PathVariable @Positive int commentId) {
+        log.info("Remove comment by a admin with commentId = {}", commentId);
+        eventService.removeCommentToAdmin(commentId);
     }
 }

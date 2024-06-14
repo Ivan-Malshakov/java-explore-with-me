@@ -12,6 +12,7 @@ import ru.practicum.ewm.exception.DataNotFoundException;
 import ru.practicum.ewm.mapper.EventAndCompilationMapper;
 import ru.practicum.ewm.model.*;
 import ru.practicum.ewm.repository.JpaCategoriesRepository;
+import ru.practicum.ewm.repository.JpaCommentRepository;
 import ru.practicum.ewm.repository.JpaEventsRepository;
 import ru.practicum.ewm.repository.JpaUsersRepository;
 import ru.practicum.ewm.utils.OffsetBasedPageRequest;
@@ -21,13 +22,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
     private final JpaEventsRepository repositoryEvent;
     private final JpaCategoriesRepository repositoryCategory;
     private final JpaUsersRepository repositoryUser;
+    private final JpaCommentRepository repositoryComment;
     private final EventAndCompilationMapper mapper;
     private final StatsClient statsClient;
 
@@ -333,5 +334,100 @@ public class EventServiceImpl implements EventService {
                 .sorted((o1, o2) -> o2.getPublishedOn().compareTo(o1.getPublishedOn()))
                 .map(i -> "/events/" + i.getId())
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public CommentDto addComment(NewCommentDto newCommentDto, int eventId, int userId) {
+        User user = repositoryUser.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User with id =" + userId + " not found"));
+        Event event = repositoryEvent.findById(eventId)
+                .orElseThrow(() -> new DataNotFoundException("Event with id = " + eventId + " not found"));
+        if (event.getState() != State.PUBLISHED) {
+            throw new ConflictRequestException("Event not published");
+        }
+        Comment comment = mapper.toModelComment(newCommentDto);
+        comment.setEvent(event);
+        comment.setAuthor(user);
+        return mapper.toCommentDto(repositoryComment.save(comment));
+    }
+
+    @Override
+    @Transactional
+    public CommentDto updateComment(NewCommentDto newCommentDto, int commentId, int userId) {
+        Comment comment = repositoryComment.findById(commentId)
+                .orElseThrow(() -> new DataNotFoundException("Comment with id =" + commentId + " not found"));
+        if (comment.getAuthor().getId() != userId) {
+            throw new ConflictRequestException("User with id = " + userId + " not author comment with id = " + commentId);
+        }
+        if (comment.getCreated().plusHours(24).isBefore(LocalDateTime.now())) {
+            throw new ConflictRequestException("The comment cannot be edited because 24 hours " +
+                    "have passed since it was created.");
+        }
+        comment.setText(newCommentDto.getText());
+        return mapper.toCommentDto(repositoryComment.save(comment));
+    }
+
+    @Override
+    public List<CommentShortDto> getCommentToEvent(int eventId, int from, int size, SortComment sort) {
+        repositoryEvent.findById(eventId)
+                .orElseThrow(() -> new DataNotFoundException("Event with id = " + eventId + " not found"));
+        List<Comment> comments;
+        OffsetBasedPageRequest pageable = new OffsetBasedPageRequest(from, size);
+        switch (sort) {
+            case DESCCREATEDDATA:
+                comments = repositoryComment.findByEvent_IdOrderByCreatedDesc(eventId, pageable);
+                break;
+            case ASCCREATEDDATA:
+                comments = repositoryComment.findByEvent_IdOrderByCreatedAsc(eventId, pageable);
+                break;
+            default:
+                throw new BadRequestException("Type parameter not found");
+        }
+        return mapper.toCommentsShortDto(comments);
+    }
+
+    @Override
+    public List<CommentDto> getCommentToAuthor(int userId, int from, int size, SortComment sort) {
+        repositoryUser.findById(userId)
+                .orElseThrow(() -> new DataNotFoundException("User with id = " + userId + " not found"));
+        List<Comment> comments;
+        OffsetBasedPageRequest pageable = new OffsetBasedPageRequest(from, size);
+        switch (sort) {
+            case DESCCREATEDDATA:
+                comments = repositoryComment.findByAuthor_IdOrderByCreatedDesc(userId, pageable);
+                break;
+            case ASCCREATEDDATA:
+                comments = repositoryComment.findByAuthor_IdOrderByCreatedAsc(userId, pageable);
+                break;
+            case DESCEVENTID:
+                comments = repositoryComment.findByAuthor_IdOrderByEventIdDesc(userId, pageable);
+                break;
+            case ASCEVENTID:
+                comments = repositoryComment.findByAuthor_IdOrderByEventIdAsc(userId, pageable);
+                break;
+            default:
+                throw new BadRequestException("Type parameter not found");
+        }
+        return mapper.toCommentsDto(comments);
+    }
+
+    @Override
+    @Transactional
+    public void removeCommentToUser(int commentId, int userId) {
+        Comment comment = repositoryComment.findById(commentId)
+                .orElseThrow(() -> new DataNotFoundException("Comment with id = " + commentId + " not found"));
+        if (comment.getAuthor().getId() != userId) {
+            throw new ConflictRequestException("User with id = " + userId + " not author comment with id = " + commentId);
+        }
+        repositoryComment.deleteById(commentId);
+    }
+
+    @Override
+    @Transactional
+    public void removeCommentToAdmin(int commentId) {
+        repositoryComment.findById(commentId)
+                .orElseThrow(() -> new DataNotFoundException("Comment with id = " + commentId + " not found"));
+        repositoryComment.deleteById(commentId);
     }
 }

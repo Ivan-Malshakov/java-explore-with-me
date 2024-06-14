@@ -5,6 +5,8 @@ import lombok.NoArgsConstructor;
 import ru.practicum.ewm.model.Location;
 import ru.practicum.ewm.model.State;
 
+import java.util.Set;
+
 @Data
 @NoArgsConstructor
 public class EventFullDto {
@@ -24,4 +26,5 @@ public class EventFullDto {
     private boolean requestModeration;
     private boolean paid;
     private Integer views;
+    private Set<CommentShortDto> comments;
 }
